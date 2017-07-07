@@ -32,12 +32,16 @@ function extractStatusCode(response) {
   return response.status;
 }
 
-fetch('http://httpbin.org/get')
-.then(extractStatusCode)
+fetch('invalid url')
+.then(extractStatusCode, errorInFetch => {
+	console.error('An error occurred in the fetch call.');
+	console.error(errorInFetch.message);
+	// Forward the error
+	return Promise.reject(errorInFetch);
+})
 .then(statusCode => {
   console.log('Request using Promises, part II. Response status code: %s', statusCode);
 })
 .catch(error => {
-  console.error('Oh shoot. Something went wrong with the promise code:');
-  console.error(error.message);
+  console.error('This will now be executed as another exception handler.');
 });
