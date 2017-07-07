@@ -28,20 +28,48 @@ const request = require('request');
 
 //Refactored to use a second .then()
 
-function extractStatusCode(response) {
-  return response.status;
-}
+// function extractStatusCode(response) {
+//   response = undefined;
+//   return response.status;
+// }
+ 
+// fetch('http://httpbin.org/get')
+// .then(extractStatusCode, errorInFetch => {
+//   console.error('This will not be executed.');
+//   console.error(errorInFetch.message);
+//   // forward the error
+//   return Promise.reject(errorInFetch);
+// })
+// .then(statusCode => {
+//   console.log('Request using Promises. Response status code: %s', statusCode);
+// })
+// .catch(error => {
+//   console.error('There was an error somewhere in the chain.');
+//   console.error(error.message);
+// });
 
-fetch('invalid url')
-.then(extractStatusCode, errorInFetch => {
-	console.error('An error occurred in the fetch call.');
-	console.error(errorInFetch.message);
-	// Forward the error
-	return Promise.reject(errorInFetch);
-})
-.then(statusCode => {
-  console.log('Request using Promises, part II. Response status code: %s', statusCode);
-})
-.catch(error => {
-  console.error('This will now be executed as another exception handler.');
+//Using Promise.all()
+
+const queryParameters = ['ahoy', 'hello', 'hallo'];
+
+const fetchPromises = queryParameters.map(queryParam => {
+  return fetch(`http://httpbin.org/get?${queryParam}`)
+    .then(response => {
+      // parse response body as JSON
+      return response.json()
+    })
+    .then(response => {
+      // extract the URL property from the response object
+      let url = response.url;
+      console.log('Response from: %s', url);
+      return url;
+    });
+});
+
+Promise.all(fetchPromises).then(allUrls => {
+  console.log('The return values of all requests are passed as an array:');
+  console.log(allUrls);
+}).catch(error => {
+  console.error('A call failed:');
+  console.error(error.message);
 });
